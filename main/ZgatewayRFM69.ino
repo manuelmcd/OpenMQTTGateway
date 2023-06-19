@@ -110,6 +110,7 @@ void setupRFM69(void) {
   radio.setPowerLevel(GC_POWER_LEVEL); // power output ranges from 0 (5dBm) to 31 (20dBm)
 
   if (pGC->encryptkey[0] != '\0')
+    Log.notice(F("Enabling RFM69 AES encryption" CR));
     radio.encrypt(pGC->encryptkey);
 
   switch (pGC->rfmfrequency) {
@@ -129,7 +130,9 @@ void setupRFM69(void) {
       freq = -1;
       break;
   }
+
   Log.notice(F("ZgatewayRFM69 Listening and transmitting at: %d" CR), freq);
+  radio.readAllRegs();
 
   size_t len = snprintf_P(RadioConfig, sizeof(RadioConfig), JSONtemplate,
                           freq, GC_IS_RFM69HCW, pGC->networkid, GC_POWER_LEVEL);
