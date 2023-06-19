@@ -33,28 +33,28 @@ extern void MQTTtoRFM69(char* topicOri, JsonObject& RFdata);
 /*----------------------RFM69 topics & parameters -------------------------*/
 // Topic where the message from RFM69 will be published by the gateway,
 // appended with the nodeID of the sender
-#define subjectRFM69toMQTT "/RFM69toMQTT"
+#define subjectRFM69toMQTT "/rfm69"
 
 // Topic subscribed by the gateway. Messages received will be sent to RFM69
-#define subjectMQTTtoRFM69 "/commands/MQTTtoRFM69"
+#define subjectMQTTtoRFM69 "/commands/rfm69"
 #define RFM69receiverKey   "RCV_" // receiver id will be defined if a subject contains RFM69receiverKey followed by a value of 3 digits
 // On reception of an ack from RFM69, the message that has been sent is published here
-#define subjectGTWRFM69toMQTT  "/RFM69toMQTT/acked"
+#define subjectGTWRFM69toMQTT  "/rfm69/acked"
 #define defaultRFM69ReceiverId 99
 
 // Default values
-const char PROGMEM ENCRYPTKEY[] = "sampleEncryptKey";
+const char PROGMEM ENCRYPTKEY[] = "";
 const char PROGMEM MDNS_NAME[] = "rfm69gw1";
 const char PROGMEM MQTT_BROKER[] = "raspi2";
 const char PROGMEM RFM69AP_NAME[] = "RFM69-AP";
-#define NETWORKID 200 //the same on all nodes that talk to each other
+#define NETWORKID 100 //the same on all nodes that talk to each other
 #define NODEID    10
 
 //Match frequency to the hardware version of the radio
 #define FREQUENCY RF69_433MHZ
 //#define FREQUENCY     RF69_868MHZ
 //#define FREQUENCY      RF69_915MHZ
-#define IS_RFM69HCW true // set to 'true' if you are using an RFM69HCW module
+#define IS_RFM69HCW false // set to 'true' if you are using an RFM69HCW module
 #define POWER_LEVEL 31
 
 /*-------------------PIN DEFINITIONS----------------------*/
@@ -64,10 +64,10 @@ const char PROGMEM RFM69AP_NAME[] = "RFM69-AP";
 #  define RFM69_IRQN digitalPinToInterrupt(RFM69_IRQ)
 #  define RFM69_RST  D4 // GPIO02/D4
 #elif defined(ESP32)
-#  define RFM69_CS   1
-#  define RFM69_IRQ  8 // GPIO15/D8
+#  define RFM69_CS   5
+#  define RFM69_IRQ  26
 #  define RFM69_IRQN digitalPinToInterrupt(RFM69_IRQ)
-#  define RFM69_RST  4 // GPIO02/D4
+#  define RFM69_RST  16
 #else
 //RFM69 not tested with arduino
 #  define RFM69_CS   10

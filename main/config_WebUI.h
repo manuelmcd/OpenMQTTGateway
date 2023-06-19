@@ -111,8 +111,8 @@ bool newSSD1306Message = false; // Flag to indicate new message to display
 
 /*------------------- End of Global Functions ----------------------*/
 
-#define subjectMQTTtoWebUIset "/commands/MQTTtoWebUI/config"
-#define subjectWebUItoMQTT    "/WebUItoMQTT"
+#define subjectMQTTtoWebUIset "/commands/webui/config"
+#define subjectWebUItoMQTT    "/webui"
 
 /*------------------- Unit Conversion Functions ----------------------*/
 

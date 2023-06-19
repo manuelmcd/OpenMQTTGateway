@@ -412,7 +412,7 @@ int lowpowermode = DEFAULT_LOW_POWER_MODE;
 #    ifdef ESP8266
 //#      define LED_SEND_RECEIVE 40
 #    elif ESP32
-//#      define LED_SEND_RECEIVE 40
+#      define LED_SEND_RECEIVE 2
 #    elif __AVR_ATmega2560__ //arduino mega
 //#      define LED_SEND_RECEIVE 40
 #    else //arduino uno/nano
@@ -678,10 +678,10 @@ Adafruit_NeoPixel leds2(ANEOPIX_IND_NUM_LEDS, ANEOPIX_IND_DATA_GPIO2, ANEOPIX_IN
 #define TimeBetweenCheckingSYS       3600 // time between (s) system checkings (like updates)
 #define TimeLedON                    1 // time LED are ON
 #define InitialMQTTConnectionTimeout 10 // time estimated (s) before the board is connected to MQTT
-#define subjectSYStoMQTT             "/SYStoMQTT" // system parameters
+#define subjectSYStoMQTT             "/sys" // system parameters
 #define subjectRLStoMQTT             "/RLStoMQTT" // latest release information
-#define subjectMQTTtoSYSset          "/commands/MQTTtoSYS/config"
-#define subjectMQTTtoSYSupdate       "/commands/MQTTtoSYS/firmware_update"
+#define subjectMQTTtoSYSset          "/commands/sys/config"
+#define subjectMQTTtoSYSupdate       "/commands/sysfirmware_update"
 #define TimeToResetAtStart           5000 // Time we allow the user at start for the reset command by button press
 /*-------------------DEFINE LOG LEVEL----------------------*/
 #ifndef LOG_LEVEL
