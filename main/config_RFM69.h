@@ -48,7 +48,7 @@ const char PROGMEM MDNS_NAME[] = "rfm69gw1";
 const char PROGMEM MQTT_BROKER[] = "raspi2";
 const char PROGMEM RFM69AP_NAME[] = "RFM69-AP";
 #define NETWORKID 100 //the same on all nodes that talk to each other
-#define NODEID    10
+#define NODEID    1
 
 //Match frequency to the hardware version of the radio
 #define FREQUENCY RF69_433MHZ

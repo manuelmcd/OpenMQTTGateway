@@ -32,6 +32,8 @@
 
 #ifdef ZgatewayRFM69
 
+#include "yparse.h"
+
 #  include <EEPROM.h>
 #  include <RFM69.h> //https://www.github.com/lowpowerlab/rfm69
 
@@ -94,7 +96,7 @@ void setupRFM69(void) {
 #  endif
   int freq;
   static const char PROGMEM JSONtemplate[] =
-      R"({"msgType":"config","freq":%d,"rfm69hcw":%d,"netid":%d,"power":%d})";
+      R"({"msgType":"config","freq":%d,"rfm69hcw":%d,"netid":%d,"nodeid":%d,"power":%d})";
   char payload[128];
 
   radio = RFM69(RFM69_CS, RFM69_IRQ, GC_IS_RFM69HCW, RFM69_IRQN);
@@ -135,10 +137,12 @@ void setupRFM69(void) {
   radio.readAllRegs();
 
   size_t len = snprintf_P(RadioConfig, sizeof(RadioConfig), JSONtemplate,
-                          freq, GC_IS_RFM69HCW, pGC->networkid, GC_POWER_LEVEL);
+                          freq, GC_IS_RFM69HCW, pGC->networkid, pGC->nodeid, GC_POWER_LEVEL);
   if (len >= sizeof(RadioConfig)) {
     Log.trace(F("\n\n*** RFM69 config truncated ***\n" CR));
+    RadioConfig[sizeof(RadioConfig)-1] = 0;
   }
+  Log.notice(RadioConfig);
 }
 
 bool RFM69toMQTT(void) {
@@ -163,7 +167,7 @@ bool RFM69toMQTT(void) {
     }
     //updateClients(senderId, rssi, (const char *)data);
 
-    Log.trace(F("Data received: %s" CR), (const char*)data);
+    Log.notice(F("Data received: %s" CR), (const char*)data);
 
     char buff[sizeof(subjectRFM69toMQTT) + 4];
     sprintf(buff, "%s/%d", subjectRFM69toMQTT, SENDERID);
@@ -171,6 +175,37 @@ bool RFM69toMQTT(void) {
     RFM69data["rssi"] = (int)radio.RSSI;
     RFM69data["senderid"] = (int)radio.SENDERID;
     pub(buff, RFM69data);
+
+    if(data[0] == '{' && data[strlen((const char*)data)-1] == '}') {
+	yparser yp;
+	int r = yparse(&yp, (const char*)data);
+	Log.trace(F("yparse ret = %d" CR), r);
+	if(r >= 0) {
+	    const int BUFLEN = 100;
+	    char topicbuf[BUFLEN], valuebuf[BUFLEN];
+	    topicbuf[0] = 'X';
+	    while(yparse_get_function_msg(&yp, &topicbuf[1], BUFLEN-1, valuebuf, BUFLEN) != 0) {
+		pubMQTT(topicbuf, valuebuf);
+	    }
+	    if(sizeof(subjectRFM69toMQTT) < BUFLEN-4-1) {  // allow 4 chars for node id
+		snprintf(topicbuf, BUFLEN-1, "%s/%d/", subjectRFM69toMQTT, SENDERID);
+		int tbase_len = strlen(topicbuf);
+	        while(yparse_get_node_msg(&yp, &topicbuf[tbase_len], BUFLEN-1-tbase_len, valuebuf, BUFLEN) != 0) {
+		    pub(topicbuf, valuebuf);
+		}
+	    }
+	    else {
+		Log.error(F("Topic buf too small" CR));
+	    }
+	}
+	else {
+	    Log.error(F("Failed to parse as yaml" CR));
+	}
+    }
+    else {
+	Log.notice(F("Not yaml" CR));
+    }
+
 
     return true;
   } else {
